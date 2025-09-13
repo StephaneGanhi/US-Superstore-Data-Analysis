@@ -1,0 +1,98 @@
+﻿SELECT *
+FROM dbo.Orders$;
+
+SELECT TABLE_NAME
+FROM INFORMATION_SCHEMA.TABLES;
+
+SELECT COLUMN_NAME, DATA_TYPE
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME = 'Orders$';
+
+SELECT TOP 10 * 
+FROM dbo.Orders$;
+
+--Vérifier les doublons 
+SELECT [Order ID], COUNT(*) 
+FROM dbo.Orders$
+GROUP BY [Order ID]
+HAVING COUNT(*) > 1;
+
+--Verifier les valeurs manquantes
+SELECT COUNT(*) - COUNT(Sales) AS Missing_Sales,
+       COUNT(*) - COUNT(Profit) AS Missing_Profit,
+       COUNT(*) - COUNT([Order Date]) AS Missing_Date
+FROM dbo.Orders$;
+
+--Créer des colonnes utiles (Année, Mois, Trimestre)
+SELECT [Order Date],
+       YEAR([Order Date]) AS Year,
+       MONTH([Order Date]) AS Month,
+       DATENAME(QUARTER, [Order Date]) AS Quarter
+FROM dbo.Orders$;
+
+
+--Chiffres d'affaires total
+SELECT SUM(Sales) AS Total_Sales
+FROM dbo.Orders$;
+
+--Profit total et marge
+SELECT SUM(Profit) AS Total_Profit,
+       SUM(Profit) / SUM(Sales) * 100 AS Profit_Margin
+FROM dbo.Orders$;
+
+--Nombre de commandes
+SELECT COUNT(DISTINCT [Order ID]) AS Total_Orders
+FROM dbo.Orders$;
+
+--Panier moyen
+SELECT SUM(Sales) / COUNT(DISTINCT [Order ID]) AS Avg_Order_Value
+FROM dbo.Orders$;
+
+-- 4) Analyse détaillée par catégorie 
+-- Ventes & profits par catégorie
+SELECT [Category], 
+       SUM(Sales) AS Total_Sales,
+       SUM(Profit) AS Total_Profit
+FROM dbo.Orders$
+GROUP BY Category
+ORDER BY Total_Sales DESC;
+
+--Top 10 produits par ventes
+SELECT TOP 10 [Product Name], SUM(Sales) AS Total_Sales
+FROM dbo.Orders$
+GROUP BY [Product Name]
+ORDER BY Total_Sales DESC;
+
+--Analyse régionale
+SELECT Region, SUM(Sales) AS Total_Sales, SUM(Profit) AS Total_Profit
+FROM dbo.Orders$
+GROUP BY Region
+ORDER BY Total_Sales DESC;
+
+--Impact des remises
+SELECT Discount, SUM(Sales) AS Total_Sales, SUM(Profit) AS Total_Profit
+FROM dbo.Orders$
+GROUP BY Discount
+ORDER BY Discount;
+
+-- 5. 📅 Analyse temporelle
+--Ventes par année
+SELECT YEAR([Order Date]) AS Year, SUM(Sales) AS Total_Sales
+FROM dbo.Orders$
+GROUP BY YEAR([Order Date])
+ORDER BY Year;
+
+--Ventes par mois
+SELECT YEAR([Order Date]) AS Year, MONTH([Order Date]) AS Month, SUM(Sales) AS Total_Sales
+FROM dbo.Orders$
+GROUP BY YEAR([Order Date]), MONTH([Order Date])
+ORDER BY Year, Month;
+
+
+
+
+
+
+
+
+
